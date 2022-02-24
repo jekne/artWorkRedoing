@@ -14,6 +14,7 @@ import { getUserWithStoredToken } from "./store/user/actions";
 import { Jumbotron } from "react-bootstrap";
 import HomePage from "./pages/HomePage/HomePage";
 import ArtworDetails from "./pages/ArtworkDetails/ArtworkDetails";
+import StartAuction from "./pages/StartAuction/StartAuction";
 
 // const Home = () => (
 //   <Jumbotron>
@@ -42,6 +43,7 @@ function App() {
       <Routes>
         <Route exact path="/" element={<HomePage />} />
         <Route path="/artworkdetails/:id" element={<ArtworDetails />} />
+        <Route path="/auction" element={<StartAuction />} />
         <Route path="/other" element={<Other />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />

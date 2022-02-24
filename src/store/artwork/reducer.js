@@ -43,13 +43,31 @@ export default function reducer(state = initialState, action) {
       };
     }
     case "ARTWORK/giveBids": {
-      console.log("Reducer, ARTWORK/giveBids", action.payload);
+      // console.log("Reducer, ARTWORK/giveBids", action.payload);
+      const addNewBid = [...state.artworkDetails.bids, action.payload].sort(
+        (a, b) => (a.amount < b.amount ? 1 : -1)
+      );
+
       return {
         ...state,
         artworkDetails: {
           ...state.artworkDetails,
-          bids: [...state.artworkDetails.bids, action.payload],
+          // bids: [...state.artworkDetails.bids, action.payload],
+          bids: [...addNewBid],
         },
+      };
+    }
+    case "ARTWORK/startAuction": {
+      console.log("Reducer, ARTWORK/startAuction", action.payload);
+      return {
+        ...state,
+      };
+    }
+
+    case "USERS/newStory": {
+      console.log("reducer USERS/newStory", action.payload);
+      return {
+        ...state,
       };
     }
     default: {

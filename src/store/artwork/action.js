@@ -92,9 +92,16 @@ export function artworRecevingABid(artworkId, amount) {
   return async function thunk(dispatch, getState) {
     try {
       const { user } = getState();
+
       console.log(
         `THIS IS MY USER GETSTATE ${user}, and my artworkId from thunk ${artworkId}`
       );
+
+      // const isHeighest = false /*some logic - return false / true*/
+
+      // if (!isHeighest){
+
+      // }
 
       const response = await axios.put(
         `${apiUrl}/bids/${artworkId}`,
@@ -110,6 +117,87 @@ export function artworRecevingABid(artworkId, amount) {
       console.log("My token", user.token);
 
       dispatch(giveBids(response.data.createBid));
+    } catch (e) {}
+  };
+}
+
+//
+export function startAnAuction(auctionItems) {
+  console.log("what is this", auctionItems);
+  return {
+    type: "ARTWORK/startAuction",
+    payload: auctionItems,
+  };
+}
+
+export function newAuction(title, minimumBid, imageUrl) {
+  return async function thunk(dispatch, getState) {
+    try {
+      const { user } = getState();
+      const userId = user.user.id;
+      console.log(
+        `THIS IS MY USER GETSTATE ${user}, and my artworkId from thunk ${userId}`
+      );
+
+      const response = await axios.post(
+        `${apiUrl}/artworks/${userId}`,
+        {
+          title,
+          minimumBid,
+          imageUrl,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      console.log("response from thunk", response.data);
+      console.log("Am I getting here?", response);
+      console.log("My token", user.token);
+
+      dispatch(startAnAuction(response.data));
+    } catch (e) {}
+  };
+}
+//
+
+export function newStory(title, minimumBid, imageUrl) {
+  return {
+    type: "USERS/newStory",
+    payload: title,
+    minimumBid,
+    imageUrl,
+  };
+}
+
+export function createNewStory({ title, minimumBid, imageUrl, token }) {
+  return async function thunk(dispatch, getState) {
+    try {
+      const { user } = getState();
+      const spaceId = user.space.id;
+      console.log(
+        `THIS IS MY USER GETSTATE ${user}, and my spaceId from thiunk ${spaceId}`
+      );
+      const response = await axios.post(
+        `${apiUrl}/stories/${spaceId}`,
+        {
+          title,
+          minimumBid,
+          imageUrl,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("My token", token);
+      console.log("response from thunk", response);
+      //   console.log("Am I getting here?", response);
+
+      // HERE WE ARE DISPATCHING THE MESSAGE WHO WILL RENDER ON THE TOP OF THE PAGE
+      // dispatch(
+      //   showMessageWithTimeout("success", false, "Story posted on your space!")
+      // );
+      // i went more deep and give the getAllSpaces, to have just an array otherwise could use just data
+      dispatch(newStory(response.data));
     } catch (e) {}
   };
 }

@@ -26,7 +26,7 @@ const tokenStillValid = (userWithoutToken) => ({
 
 export const logOut = () => ({ type: LOG_OUT });
 
-export const signUp = (name, email, password) => {
+export const signUp = (name, email, password, isArtist) => {
   return async (dispatch, getState) => {
     dispatch(appLoading());
     try {
@@ -34,8 +34,9 @@ export const signUp = (name, email, password) => {
         name,
         email,
         password,
+        isArtist,
       });
-
+      console.log("my response from the login", response);
       dispatch(loginSuccess(response.data));
       dispatch(showMessageWithTimeout("success", true, "account created"));
       dispatch(appDoneLoading());

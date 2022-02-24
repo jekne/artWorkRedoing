@@ -7,9 +7,13 @@ import { selectToken } from "../../store/user/selectors";
 import NavbarItem from "./NavbarItem";
 import LoggedIn from "./LoggedIn";
 import LoggedOut from "./LoggedOut";
+import { selectArtist } from "../../store/user/selectors";
 
 export default function Navigation() {
   const token = useSelector(selectToken);
+
+  const selectorLogedAsAntirst = useSelector(selectArtist);
+  console.log("this is the loged check if is artist", selectorLogedAsAntirst);
 
   const loginLogoutControls = token ? <LoggedIn /> : <LoggedOut />;
 
@@ -23,6 +27,12 @@ export default function Navigation() {
         <Nav style={{ width: "100%" }} fill>
           <NavbarItem path="/" linkText="Home" />
           <NavbarItem path="/other" linkText="Other" />
+          {!selectorLogedAsAntirst ? (
+            ""
+          ) : (
+            <NavbarItem path="/auction" linkText="Start an Auction" />
+          )}
+
           {loginLogoutControls}
         </Nav>
       </Navbar.Collapse>
