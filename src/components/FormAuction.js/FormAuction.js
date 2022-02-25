@@ -1,29 +1,36 @@
 import { useState } from "react";
 import { Form } from "react-bootstrap";
-
 import { useDispatch } from "react-redux";
-// import { getUserWithStoredToken } from "../../store/user/actions";
 import { useSelector } from "react-redux";
-import { selectUserArtwork } from "../../store/artwork/selector";
-import {
-  startAnAuction,
-  newAuction,
-  createNewStory,
-} from "../../store/artwork/action";
-import { useParams } from "react-router";
+import { selectUser } from "../../store/user/selectors";
+import { newAuction } from "../../store/artwork/action";
+import { showMessageWithTimeout } from "../../store/appState/actions";
 
-// /The form contains inputs for title, minimum bid & imageUrl
 export default function FormAuction() {
   const [title, set_Title] = useState("");
   const [minimunBid, set_MinimunBid] = useState("");
   const [imageUrl, set_ImageUrl] = useState("");
 
+  const userInfo = useSelector(selectUser);
+  // console.log("select user", userInfo);
+
   const dispatch = useDispatch();
+
+  /// check about the user id
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(createNewStory({ title, minimunBid, imageUrl }));
-    console.log("i am being clicked", title, minimunBid, imageUrl);
+    dispatch(newAuction(title, minimunBid, imageUrl, userInfo.id));
+    dispatch(
+      showMessageWithTimeout(
+        "success",
+        false,
+        "An auction was made! Good Luck!"
+      )
+    );
+    set_Title("");
+    set_MinimunBid("");
+    set_ImageUrl("");
   };
 
   return (

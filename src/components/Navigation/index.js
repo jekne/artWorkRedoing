@@ -13,7 +13,7 @@ export default function Navigation() {
   const token = useSelector(selectToken);
 
   const selectorLogedAsAntirst = useSelector(selectArtist);
-  console.log("this is the loged check if is artist", selectorLogedAsAntirst);
+  // console.log("this is the loged check if is artist", selectorLogedAsAntirst);
 
   const loginLogoutControls = token ? <LoggedIn /> : <LoggedOut />;
 

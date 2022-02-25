@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Form } from "react-bootstrap";
-
+import { showMessageWithTimeout } from "../../store/appState/actions";
 import { useDispatch } from "react-redux";
 // import { getUserWithStoredToken } from "../../store/user/actions";
 import { useSelector } from "react-redux";
@@ -12,20 +12,44 @@ import { selectArtworkById } from "../../store/artwork/selector";
 export default function FormBid() {
   const params = useParams();
   const id = params.id;
+  const userLoginCheck = useSelector(selectUserArtwork);
+  const artworkByidSelector = useSelector(selectArtworkById);
 
-  const [bid, set_Bid] = useState("");
+  const currentBids =
+    artworkByidSelector &&
+    artworkByidSelector.bids.map((eachBid) => {
+      // console.log("each bid", eachBid);
+      return eachBid.amount;
+    });
+  const highestCurrentBid = Math.max(...currentBids);
+
+  // console.log("my highets bid", highestCurrentBid);
+  // console.log("the current bids", currentBids);
+
+  // console.log("keep the higher bi", keepHigherBid);
+
+  const [bid, set_Bid] = useState(highestCurrentBid + 1);
 
   const dispatch = useDispatch();
 
-  const userLoginCheck = useSelector(selectUserArtwork);
   // console.log("this is my user Login Check", userLoginCheck);
 
-  const artworkByidSelector = useSelector(selectArtworkById);
-  console.log("artwork by id selector", artworkByidSelector);
+  // console.log("artwork by id from the FORM", artworkByidSelector);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(artworRecevingABid(id, bid));
+    if (highestCurrentBid > bid) {
+      dispatch(
+        showMessageWithTimeout(
+          "success",
+          false,
+          "YOU NEED TO GIVE A HIGHER BID!"
+        )
+      );
+    }
+    if (bid > highestCurrentBid) {
+      dispatch(artworRecevingABid(id, bid));
+    }
   };
 
   return (
@@ -42,8 +66,8 @@ export default function FormBid() {
                   {" "}
                   <label>AMOUNT:</label>
                   <input
-                    value={bid}
                     type="number"
+                    value={bid}
                     onChange={(event) => set_Bid(event.target.value)}
                   />
                   <button onClick={handleSubmit}> BID</button>
@@ -56,8 +80,3 @@ export default function FormBid() {
     </div>
   );
 }
-// onClick={() =>
-//                       dispatch(
-//                         artworkHearts(
-//                           artworkByidSelector.id,
-//                           artworkByidSelector.hearts

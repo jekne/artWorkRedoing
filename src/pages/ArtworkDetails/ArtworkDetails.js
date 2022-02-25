@@ -13,7 +13,7 @@ export default function ArtworDetails() {
   const dispatch = useDispatch();
 
   const artworkByidSelector = useSelector(selectArtworkById);
-  //   console.log("artwork by id selector", artworkByidSelector);
+  // console.log("artwork by id from the ARTWORKDEATAILS", artworkByidSelector);
 
   useEffect(() => {
     dispatch(fetchArtworkByID(id));

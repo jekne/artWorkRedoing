@@ -1,9 +1,42 @@
 import axios from "axios";
+import { showMessageWithTimeout } from "../appState/actions";
 import { apiUrl } from "../../config/constants";
 
 export function artworksFullyFetched(data) {
   return {
     type: "ARTWORKS/allArtworksFetched",
+    payload: data,
+  };
+}
+
+export function giveBids(bid) {
+  console.log("in the action creator", bid);
+  return {
+    type: "ARTWORK/giveBids",
+    payload: bid,
+  };
+}
+
+export function setArtwork(artwork) {
+  return {
+    type: "ARTWORK/setArtwork",
+    payload: artwork,
+  };
+}
+
+export function increaseHeart(hearts) {
+  console.log("increase heart", hearts);
+
+  return {
+    type: "ARTWORK/increaseHearts",
+    payload: hearts,
+  };
+}
+
+export function startAnAuction(data) {
+  console.log("what is this", data);
+  return {
+    type: "ARTWORK/startAuction",
     payload: data,
   };
 }
@@ -25,13 +58,6 @@ export function fetchArtworksWithBids() {
   };
 }
 
-export function setArtwork(artwork) {
-  return {
-    type: "ARTWORK/setArtwork",
-    payload: artwork,
-  };
-}
-
 export function fetchArtworkByID(id) {
   return async function thunk(dispatch, getState) {
     try {
@@ -44,16 +70,9 @@ export function fetchArtworkByID(id) {
 
       // i went more deep and give the getAllSpaces, to have just an array otherwise could use just data
       dispatch(setArtwork(response.data.getArtworkByIdIncludeBid));
-    } catch (e) {}
-  };
-}
-
-export function increaseHeart(hearts) {
-  console.log("increase heart", hearts);
-
-  return {
-    type: "ARTWORK/increaseHearts",
-    payload: hearts,
+    } catch (e) {
+      console.log("error:", e);
+    }
   };
 }
 
@@ -81,13 +100,6 @@ export function artworkHearts(id, hearts) {
   };
 }
 
-export function giveBids(bid) {
-  return {
-    type: "ARTWORK/giveBids",
-    payload: bid,
-  };
-}
-
 export function artworRecevingABid(artworkId, amount) {
   return async function thunk(dispatch, getState) {
     try {
@@ -112,92 +124,53 @@ export function artworRecevingABid(artworkId, amount) {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      console.log("response from thunk", response.data);
-      console.log("Am I getting here?", response);
-      console.log("My token", user.token);
-
-      dispatch(giveBids(response.data.createBid));
+      // console.log("response from thunk", response.data);
+      // console.log("Am I getting here?", response);
+      // console.log("My token", user.token);
+      console.log("the data given to the action creator", response.data);
+      dispatch(giveBids(response.data.bid));
+      dispatch(
+        showMessageWithTimeout(
+          "success",
+          false,
+          "An auction was made! Good Luck!"
+        )
+      );
     } catch (e) {}
   };
 }
 
-//
-export function startAnAuction(auctionItems) {
-  console.log("what is this", auctionItems);
-  return {
-    type: "ARTWORK/startAuction",
-    payload: auctionItems,
-  };
-}
-
-export function newAuction(title, minimumBid, imageUrl) {
+export function newAuction(title, minimumBid, imageUrl, id) {
   return async function thunk(dispatch, getState) {
     try {
-      const { user } = getState();
-      const userId = user.user.id;
-      console.log(
-        `THIS IS MY USER GETSTATE ${user}, and my artworkId from thunk ${userId}`
-      );
+      const token = localStorage.getItem("token");
+
+      // const user = getState();
+      // const userId = user.user.id;
+      // console.log(
+      //   `THIS IS MY USER GETSTATE ${user}, and my artworkId from thunk ${userId}`
+      // );
+      // console.log("my token", user.token);
+      console.log("this is my id", id);
 
       const response = await axios.post(
-        `${apiUrl}/artworks/${userId}`,
+        `${apiUrl}/artworks/${id}`,
         {
           title,
           minimumBid,
           imageUrl,
+          id,
         },
         {
-          headers: { Authorization: `Bearer ${user.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("response from thunk", response.data);
-      console.log("Am I getting here?", response);
-      console.log("My token", user.token);
+      // console.log("response from thunk", response.data);
+      // console.log("Am I getting here?", response);
+      // console.log("My token", token);
 
       dispatch(startAnAuction(response.data));
     } catch (e) {}
   };
 }
 //
-
-export function newStory(title, minimumBid, imageUrl) {
-  return {
-    type: "USERS/newStory",
-    payload: title,
-    minimumBid,
-    imageUrl,
-  };
-}
-
-export function createNewStory({ title, minimumBid, imageUrl, token }) {
-  return async function thunk(dispatch, getState) {
-    try {
-      const { user } = getState();
-      const spaceId = user.space.id;
-      console.log(
-        `THIS IS MY USER GETSTATE ${user}, and my spaceId from thiunk ${spaceId}`
-      );
-      const response = await axios.post(
-        `${apiUrl}/stories/${spaceId}`,
-        {
-          title,
-          minimumBid,
-          imageUrl,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log("My token", token);
-      console.log("response from thunk", response);
-      //   console.log("Am I getting here?", response);
-
-      // HERE WE ARE DISPATCHING THE MESSAGE WHO WILL RENDER ON THE TOP OF THE PAGE
-      // dispatch(
-      //   showMessageWithTimeout("success", false, "Story posted on your space!")
-      // );
-      // i went more deep and give the getAllSpaces, to have just an array otherwise could use just data
-      dispatch(newStory(response.data));
-    } catch (e) {}
-  };
-}
